@@ -1,4 +1,4 @@
-"""Custom integration to integrate Kramer media switches with Home Assistant.
+"""Custom integration for Kramer media switches with Home Assistant.
 
 For more details about this integration, please refer to
 https://github.com/krohrbaugh/kramer-homeassistant
@@ -6,31 +6,28 @@ https://github.com/krohrbaugh/kramer-homeassistant
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from homeassistant.const import CONF_NAME, CONF_IP_ADDRESS, CONF_PORT, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import IntegrationBlueprintApiClient
+from .api import KramerApiClient
 from .const import DOMAIN
-from .coordinator import BlueprintDataUpdateCoordinator
+from .coordinator import KramerDataUpdateCoordinator
 
 PLATFORMS: list[Platform] = [
-    Platform.SENSOR,
-    Platform.BINARY_SENSOR,
-    Platform.SWITCH,
+    Platform.MEDIA_PLAYER,
 ]
-
 
 # https://developers.home-assistant.io/docs/config_entries_index/#setting-up-an-entry
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator = BlueprintDataUpdateCoordinator(
-        hass=hass,
-        client=IntegrationBlueprintApiClient(
-            username=entry.data[CONF_USERNAME],
-            password=entry.data[CONF_PASSWORD],
-            session=async_get_clientsession(hass),
+    hass.data[DOMAIN][entry.entry_id] = coordinator = KramerDataUpdateCoordinator(
+        hass = hass,
+        client = KramerApiClient(
+            name = entry.data[CONF_NAME],
+            ip_address = entry.data[CONF_IP_ADDRESS],
+            port = entry.data.get(CONF_PORT, None),
         ),
     )
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
