@@ -1,6 +1,6 @@
 """Adds config flow for Kramer integration."""
 from __future__ import annotations
-from typing import Dict, TypedDict
+from typing import TypedDict
 
 import voluptuous as vol
 from homeassistant import config_entries
@@ -15,7 +15,8 @@ from .api import (
 from .const import DOMAIN, LOGGER
 
 class KramerConfigInput(TypedDict):
-    """Configuration input structure"""
+    """Configuration input structure."""
+
     CONF_NAME: str
     CONF_IP_ADDRESS: str
     CONF_PORT: int | None
@@ -56,7 +57,7 @@ class KramerConfigFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         user_input: KramerConfigInput | None = None,
     ) -> config_entries.FlowResult:
         """Handle a flow initialized by the user."""
-        errors: Dict[str, str] = {}
+        errors: dict[str, str] = {}
         config_input: KramerConfigInput = user_input or {}
 
         name: str = config_input.get(CONF_NAME, "")
@@ -97,7 +98,7 @@ class KramerConfigFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def _test_connection(self, name: str, ip_address: str, port: int | None) -> bool:
-        """Validate device connection details"""
+        """Validate device connection details."""
         client = KramerApiClient(
             name = name,
             ip_address = ip_address,

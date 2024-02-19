@@ -1,4 +1,4 @@
-"""Media Player platform entity implementation"""
+"""Media Player platform entity implementation."""
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
     MediaPlayerEntityDescription,
@@ -26,7 +26,7 @@ ENTITY_DESCRIPTIONS = (
 )
 
 async def async_setup_entry(hass, entry, async_add_devices):
-    """Setup the media_player platform."""
+    """Set up devices based on config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_devices(
         KramerMediaPlayer(
@@ -55,7 +55,7 @@ class KramerMediaPlayer(KramerEntity, MediaPlayerEntity):
 
     @property
     def input_count(self) -> int:
-        """Number of inputs supported by the media player"""
+        """Number of inputs supported by the media player."""
         return self._prop(DATA_INPUT_COUNT)
 
     @property

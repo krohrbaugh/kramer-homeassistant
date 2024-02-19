@@ -1,4 +1,4 @@
-"""Synchronous Kramer API client"""
+"""Synchronous Kramer API client."""
 from typing import TypedDict
 
 from homeassistant.components.media_player import MediaPlayerState
@@ -23,13 +23,14 @@ class KramerApiClientCommunicationError(
 
 class KramerApiState(TypedDict):
     """Serialized state of a media switch device."""
+
     DATA_INPUT_COUNT: int
     DATA_SOURCE_LIST: list[str]
     DATA_SOURCE_SELECTED: int
     DATA_STATE: MediaPlayerState
 
 class KramerApiClient:
-    """Wraps synchronous kessler-av client"""
+    """Wraps synchronous kessler-av client."""
 
     _DEFAULT_STATE: KramerApiState = {
         DATA_INPUT_COUNT: 0,
@@ -44,6 +45,7 @@ class KramerApiClient:
         ip_address: str,
         port: int | None = None,
     ) -> None:
+        """Initialize client."""
         self._name = name
         self._ip_address = ip_address
         self._port = port
@@ -57,7 +59,7 @@ class KramerApiClient:
         self._attr_source_list: list[str] = []
 
     def refresh_state(self) -> None:
-        """Fetch and update device state"""
+        """Fetch and update device state."""
         try:
             if self._device is None:
                 self._device = get_media_switch(self._device_url)
@@ -96,7 +98,7 @@ class KramerApiClient:
 
     @property
     def state(self) -> KramerApiState:
-        """Current device state serialized to a dictionary"""
+        """Current device state serialized to a dictionary."""
         if not self.is_connected:
             return self._DEFAULT_STATE
 
@@ -114,7 +116,7 @@ class KramerApiClient:
 
     @property
     def name(self) -> str:
-        """Returns the user-provided device name"""
+        """Returns the user-provided device name."""
         return self._name
 
     @property
@@ -124,7 +126,7 @@ class KramerApiClient:
 
     @property
     def selected_source(self) -> str:
-        """Returns the currently selected source"""
+        """Returns the currently selected source."""
         return self._attr_selected_source
 
     @property
