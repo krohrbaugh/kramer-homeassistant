@@ -69,7 +69,7 @@ Integration" and search for "Kramer"
 1. Click on _Kramer_, and the device configuration form appears.
 1. Fill out the form, providing a name for the Kramer switch, and the IP address
 you configured for it.
-    ![](/assets/images/configure.png | width=250)
+    <img src="/assets/images/configure.png" width="250">
     **Figure 1** New device configuration form.
 1. Click "Submit" to create the device. If successful, HA will ask what Area to assign the
 device to.
@@ -79,12 +79,12 @@ device to.
 1. Click on the _Kramer_ integration to view configured devices.
 1. Click the device link under the name of the Kramer switch to view the device
 information page.
-    ![](/assets/images/device_info.png | width=450)
+    <img src="/assets/images/device_info.png" width="450">
     **Figure 2** Configured device information page.
 1. Click on the device name under the "Controls" section to show the source
 selection dialog. Select an input from the list and confirm that your switch
 changed inputs.
-    ![](/assets/images/source_select.png | width=300)
+    <img src="/assets/images/source_select.png" width="300">
     **Figure 3** Device source selection interface.
 
 Once you've confirmed that your switch is working correctly, consider adding
