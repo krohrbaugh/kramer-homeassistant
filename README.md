@@ -49,6 +49,22 @@ ping $IP_OF_SWITCH
 
 ### Install the integration in Home Assistant
 
+#### HACS custom repo
+
+1. From the Home Assistant Community Store (HACS) page, click the triple-dot
+menu in the top-right, and select "Custom repositories".
+1. Enter the URL to this repository, and select "Integration" in the category
+drop-down. Click "Add".
+1. The window will reload and show "Kramer Integration" with a trash can next to
+it.  This means the custom repository has been added. Close the "Custom
+repositories" dialog.
+1. In the search box, enter "Kramer", and click on the integration to load the
+description.
+1. Click "Download" in the lower right corner, then confirm the download in the dialog
+that appears.
+1. The integration files should download to `custom_components/kramer`.
+1. Restart Home Assistant to activate the integration.
+
 #### Manual install
 
 1. Using your tool of choice, open the directory (folder) for your HA
@@ -71,9 +87,9 @@ Integration" and search for "Kramer"
 you configured for it.
 
     <img src="/assets/images/configure.png" width="300">
-    
+
     **Figure 1:** New device configuration form.
-    
+
 1. Click "Submit" to create the device. If successful, HA will ask what Area to assign the
 device to.
 
@@ -86,7 +102,7 @@ information page.
     <img src="/assets/images/device_info.png" width="700">
 
     **Figure 2:** Configured device information page.
-   
+
 1. Click on the device name under the "Controls" section to show the source
 selection dialog. Select an input from the list and confirm that your switch
 changed inputs.
