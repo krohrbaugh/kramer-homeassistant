@@ -1,5 +1,6 @@
 """Synchronous Kramer API client."""
-from typing import TypedDict
+from typing import Any, TypedDict, TypeVar
+from collections.abc import Callable
 
 from homeassistant.components.media_player import MediaPlayerState
 
@@ -7,11 +8,14 @@ from kesslerav import get_media_switch, MediaSwitch
 
 from .const import (
     DATA_INPUT_COUNT,
+    DATA_OUTPUT_COUNT,
     DATA_SOURCE_LIST,
     DATA_SOURCE_SELECTED,
     DATA_STATE,
     LOGGER,
 )
+
+_T = TypeVar("_T")
 
 class KramerApiClientError(Exception):
     """Exception to indicate a general API error."""
@@ -25,6 +29,7 @@ class KramerApiState(TypedDict):
     """Serialized state of a media switch device."""
 
     DATA_INPUT_COUNT: int
+    DATA_OUTPUT_COUNT: int
     DATA_SOURCE_LIST: list[str]
     DATA_SOURCE_SELECTED: int
     DATA_STATE: MediaPlayerState
@@ -34,6 +39,7 @@ class KramerApiClient:
 
     _DEFAULT_STATE: KramerApiState = {
         DATA_INPUT_COUNT: 0,
+        DATA_OUTPUT_COUNT: 0,
         DATA_SOURCE_LIST: [],
         DATA_SOURCE_SELECTED: '0',
         DATA_STATE: MediaPlayerState.OFF,
@@ -50,47 +56,34 @@ class KramerApiClient:
         self._ip_address = ip_address
         self._port = port
 
-        self._device: MediaSwitch | None = None
+        self.__device: MediaSwitch | None = None
         self._attr_device_url: str | None = None
 
         self._attr_input_count: int = 0
+        self._attr_output_count: int = 0
         self._attr_selected_source: str = '0'
         # Needs to be list[str] to avoid issues with HA frontend
         self._attr_source_list: list[str] = []
 
     def refresh_state(self) -> None:
         """Fetch and update device state."""
-        try:
-            if self._device is None:
-                self._device = get_media_switch(self._device_url)
-            else:
-                self._device.update()
-        except (TimeoutError, ConnectionRefusedError) as exception:
-            self._device = None
-            raise KramerApiClientCommunicationError(
-                f"Failed connecting to device '{self._name}' at {self._device_url}:"
-                f" {exception}"
-            ) from exception
-        except Exception as exception:
-            self._device = None
-            raise KramerApiClientError(
-                f"Unknown error connecting to device '{self._name}' at {self._device_url}: "
-                f" {exception}"
-            ) from exception
+        device = self._device
+        self._device_io(device.update)
 
-        if self._attr_input_count != self._device.input_count:
+        if self._attr_input_count != device.input_count:
             # Only recalculate source list when input count changes
-            self._attr_input_count = self._device.input_count
+            self._attr_input_count = device.input_count
             self._attr_source_list = list(
-                map(str, range(self._device.input_count + 1))
+                map(str, range(device.input_count + 1))
             )
-        self._attr_selected_source = str(self._device.selected_source)
+        self._attr_output_count = device.output_count
+        self._attr_selected_source = str(device.selected_source)
 
     def select_source(self, source: int) -> None:
         """Select the specified input source."""
         try:
             source_number = int(source)
-            self._device.select_source(source_number)
+            self._device_io(self._device.select_source, source_number)
         except ValueError as exception:
             msg = f"Invalid source identifier '{source}'."
             LOGGER.warning(msg)
@@ -104,6 +97,7 @@ class KramerApiClient:
 
         return {
             DATA_INPUT_COUNT: self.input_count,
+            DATA_OUTPUT_COUNT: self.output_count,
             DATA_SOURCE_LIST: self.source_list,
             DATA_SOURCE_SELECTED: self.selected_source,
             DATA_STATE: MediaPlayerState.ON
@@ -125,6 +119,11 @@ class KramerApiClient:
         return self._attr_input_count
 
     @property
+    def output_count(self) -> int:
+        """Returns the number of outputs the device supports."""
+        return self._attr_output_count
+
+    @property
     def selected_source(self) -> str:
         """Returns the currently selected source."""
         return self._attr_selected_source
@@ -143,3 +142,29 @@ class KramerApiClient:
                 self._attr_device_url = f"{self._attr_device_url}:{self._port}"
 
         return self._attr_device_url
+
+    @property
+    def _device(self) -> MediaSwitch:
+        if self.__device is None:
+            self.__device = self._device_io(get_media_switch, self._device_url)
+
+        return self.__device
+
+    def _device_io(self, target: Callable[..., _T], *args: Any) -> _T:
+        """Wrap all I/O operations so that errors are translated correctly."""
+        try:
+            result = target(*args)
+        except (TimeoutError, ConnectionRefusedError) as exception:
+            self.__device = None
+            raise KramerApiClientCommunicationError(
+                f"Failed connecting to device '{self._name}' at {self._device_url}:"
+                f" {exception}"
+            ) from exception
+        except Exception as exception:
+            self.__device = None
+            raise KramerApiClientError(
+                f"Unknown error connecting to device '{self._name}' at {self._device_url}: "
+                f" {exception}"
+            ) from exception
+
+        return result

@@ -9,6 +9,7 @@ from homeassistant.components.media_player import (
 
 from .const import (
     DATA_INPUT_COUNT,
+    DATA_OUTPUT_COUNT,
     DATA_SOURCE_LIST,
     DATA_SOURCE_SELECTED,
     DATA_STATE,
@@ -21,7 +22,8 @@ from .entity import KramerEntity
 ENTITY_DESCRIPTIONS = (
     MediaPlayerEntityDescription(
         key=DOMAIN,
-        device_class=MediaPlayerDeviceClass.RECEIVER
+        device_class=MediaPlayerDeviceClass.RECEIVER,
+        has_entity_name=True,
     ),
 )
 
@@ -42,6 +44,7 @@ class KramerMediaPlayer(KramerEntity, MediaPlayerEntity):
     _attr_supported_features = (
         MediaPlayerEntityFeature.SELECT_SOURCE
     )
+    _attr_name = None
 
     def __init__(
         self,
@@ -51,12 +54,16 @@ class KramerMediaPlayer(KramerEntity, MediaPlayerEntity):
         """Initialize the entity."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_name = coordinator.client.name
 
     @property
     def input_count(self) -> int:
         """Number of inputs supported by the media player."""
         return self._prop(DATA_INPUT_COUNT)
+
+    @property
+    def output_count(self) -> int:
+        """Number of outputs supported by the media player."""
+        return self._prop(DATA_OUTPUT_COUNT)
 
     @property
     def source(self) -> str | None:

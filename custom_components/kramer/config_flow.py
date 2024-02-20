@@ -21,7 +21,7 @@ class KramerConfigInput(TypedDict):
     CONF_IP_ADDRESS: str
     CONF_PORT: int | None
 
-OPTIONS_SCHEMA = vol.Schema(
+CONFIG_SCHEMA = vol.Schema(
     {
         vol.Required(
             CONF_NAME,
@@ -87,7 +87,7 @@ class KramerConfigFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=self.add_suggested_values_to_schema(
-                OPTIONS_SCHEMA,
+                CONFIG_SCHEMA,
                 suggested_values={
                     CONF_NAME: name,
                     CONF_IP_ADDRESS: ip_address,
