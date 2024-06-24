@@ -3,6 +3,6 @@ homeassistant>=2024.6.0b0
 pip>=21.0,<24.1
 pre-commit>=3.6.1
 pytest-homeassistant-custom-component>=0.13.129
-ruff==0.4.9
+ruff==0.4.10
 
 kessler-av==0.9.0
